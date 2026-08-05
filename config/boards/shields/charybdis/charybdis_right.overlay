@@ -3,7 +3,18 @@
  *
  * SPDX-License-Identifier: MIT
  */
- 
+
+/ {
+    chosen {
+        zmk,underglow = &led_strip;
+    };
+
+    trackball_listener {
+        compatible = "zmk,input-listener";
+        device = <&trackball>;
+    };
+};
+
 #include "charybdis.dtsi"
 
 &default_transform {
@@ -11,14 +22,14 @@
 }; 
 
 &kscan0 {
-	col-gpios
-		= <&gpio0 2 GPIO_ACTIVE_HIGH>
-		, <&gpio0 29 GPIO_ACTIVE_HIGH>
-		, <&gpio0 9 GPIO_ACTIVE_HIGH>
-		, <&gpio1 0  GPIO_ACTIVE_HIGH>
-		, <&gpio0 11 GPIO_ACTIVE_HIGH>
-		, <&gpio1 4  GPIO_ACTIVE_HIGH>
-		;
+    col-gpios
+        = <&gpio0 2 GPIO_ACTIVE_HIGH>
+        , <&gpio0 29 GPIO_ACTIVE_HIGH>
+        , <&gpio0 9 GPIO_ACTIVE_HIGH>
+        , <&gpio1 0  GPIO_ACTIVE_HIGH>
+        , <&gpio0 11 GPIO_ACTIVE_HIGH>
+        , <&gpio1 4  GPIO_ACTIVE_HIGH>
+    ;
 };
 
 // trackball
@@ -62,7 +73,7 @@
 };
 
 
-//RGB bus
+// RGB bus
 &pinctrl {
     spi3_default: spi3_default {
         group1 {
@@ -102,14 +113,3 @@
                          LED_COLOR_ID_BLUE>;
     };
 };
-
-
-
-/ {
-    trackball_listener {
-        compatible = "zmk,input-listener";
-        device = <&trackball>;
-    };
-};
-
-
