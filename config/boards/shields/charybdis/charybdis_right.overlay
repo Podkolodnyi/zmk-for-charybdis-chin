@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
 / {
     chosen {
         zmk,underglow = &led_strip;
@@ -19,24 +21,27 @@
 
 &default_transform {
     col-offset = <6>;
-}; 
-
-&kscan0 {
-    col-gpios
-        = <&gpio0 2 GPIO_ACTIVE_HIGH>
-        , <&gpio0 29 GPIO_ACTIVE_HIGH>
-        , <&gpio0 9 GPIO_ACTIVE_HIGH>
-        , <&gpio1 0  GPIO_ACTIVE_HIGH>
-        , <&gpio0 11 GPIO_ACTIVE_HIGH>
-        , <&gpio1 4  GPIO_ACTIVE_HIGH>
-    ;
 };
 
-// trackball
+&kscan0 {
+    col-gpios =
+        <&gpio0 2 GPIO_ACTIVE_HIGH>,
+        <&gpio0 29 GPIO_ACTIVE_HIGH>,
+        <&gpio0 9 GPIO_ACTIVE_HIGH>,
+        <&gpio1 0 GPIO_ACTIVE_HIGH>,
+        <&gpio0 11 GPIO_ACTIVE_HIGH>,
+        <&gpio1 4 GPIO_ACTIVE_HIGH>;
+};
+
+/*
+ * Trackball PMW3610
+ */
+
 &pinctrl {
     spi0_default: spi0_default {
         group1 {
-            psels = <NRF_PSEL(SPIM_SCK, 0, 8)>,
+            psels =
+                <NRF_PSEL(SPIM_SCK, 0, 8)>,
                 <NRF_PSEL(SPIM_MOSI, 0, 17)>,
                 <NRF_PSEL(SPIM_MISO, 0, 17)>;
         };
@@ -44,9 +49,11 @@
 
     spi0_sleep: spi0_sleep {
         group1 {
-            psels = <NRF_PSEL(SPIM_SCK, 0, 8)>,
+            psels =
+                <NRF_PSEL(SPIM_SCK, 0, 8)>,
                 <NRF_PSEL(SPIM_MOSI, 0, 17)>,
                 <NRF_PSEL(SPIM_MISO, 0, 17)>;
+
             low-power-enable;
         };
     };
@@ -55,35 +62,66 @@
 &spi0 {
     status = "okay";
     compatible = "nordic,nrf-spim";
+
     pinctrl-0 = <&spi0_default>;
     pinctrl-1 = <&spi0_sleep>;
     pinctrl-names = "default", "sleep";
+
     cs-gpios = <&gpio0 20 GPIO_ACTIVE_LOW>;
 
     trackball: trackball@0 {
         status = "okay";
         compatible = "pixart,pmw3610";
+
         reg = <0>;
         spi-max-frequency = <2000000>;
-        irq-gpios = <&gpio0 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
-        scroll-layers = <3>;
-        snipe-layers = <4>;
-      // automouse-layer = <3>;
+
+        /*
+         * Было irq-gpios.
+         * Для встроенного Zephyr driver используется motion-gpios.
+         */
+        motion-gpios =
+            <&gpio0 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+
+        /*
+         * Оси движения.
+         */
+        zephyr,axis-x = <INPUT_REL_X>;
+        zephyr,axis-y = <INPUT_REL_Y>;
+
+        /*
+         * Разрешение трекбола.
+         */
+        res-cpi = <600>;
+
+        /*
+         * Эти свойства удалены, потому что они относятся
+         * к старому внешнему zmk-pmw3610-driver:
+         *
+         * scroll-layers = <3>;
+         * snipe-layers = <4>;
+         * automouse-layer = <3>;
+         */
     };
 };
 
+/*
+ * RGB bus
+ */
 
-// RGB bus
 &pinctrl {
     spi3_default: spi3_default {
         group1 {
-            psels = <NRF_PSEL(SPIM_MOSI, 0, 10)>;
+            psels =
+                <NRF_PSEL(SPIM_MOSI, 0, 10)>;
         };
     };
 
     spi3_sleep: spi3_sleep {
         group1 {
-            psels = <NRF_PSEL(SPIM_MOSI, 0, 10)>;
+            psels =
+                <NRF_PSEL(SPIM_MOSI, 0, 10)>;
+
             low-power-enable;
         };
     };
@@ -100,16 +138,20 @@
     led_strip: ws2812@0 {
         compatible = "worldsemi,ws2812-spi";
 
-        /* SPI */
-        reg = <0>; /* ignored, but necessary for SPI bindings */
+        reg = <0>;
         spi-max-frequency = <4000000>;
 
-        /* WS2812 */
-        chain-length = <27>; /* number of LEDs */
+        /*
+         * Правая половина — 27 LED.
+         */
+        chain-length = <27>;
+
         spi-one-frame = <0x70>;
         spi-zero-frame = <0x40>;
-        color-mapping = <LED_COLOR_ID_GREEN
-                         LED_COLOR_ID_RED
-                         LED_COLOR_ID_BLUE>;
+
+        color-mapping =
+            <LED_COLOR_ID_GREEN
+             LED_COLOR_ID_RED
+             LED_COLOR_ID_BLUE>;
     };
 };
