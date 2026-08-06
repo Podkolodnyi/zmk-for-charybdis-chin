@@ -77,8 +77,7 @@
         spi-max-frequency = <2000000>;
 
         /*
-         * Было irq-gpios.
-         * Для встроенного Zephyr driver используется motion-gpios.
+         * GPIO движения PMW3610.
          */
         motion-gpios =
             <&gpio0 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
@@ -90,23 +89,20 @@
         zephyr,axis-y = <INPUT_REL_Y>;
 
         /*
-         * Разрешение трекбола.
+         * CPI.
          */
-        res-cpi = <600>;
+        res-cpi = <400>;
 
         /*
-         * Эти свойства удалены, потому что они относятся
-         * к старому внешнему zmk-pmw3610-driver:
-         *
-         * scroll-layers = <3>;
-         * snipe-layers = <4>;
-         * automouse-layer = <3>;
+         * Аналог старого
+         * CONFIG_PMW3610_SMART_ALGORITHM=y.
          */
+        smart-mode;
     };
 };
 
 /*
- * RGB bus
+ * RGB LED strip
  */
 
 &pinctrl {
@@ -142,7 +138,7 @@
         spi-max-frequency = <4000000>;
 
         /*
-         * Правая половина — 27 LED.
+         * Правая половина Charybdis.
          */
         chain-length = <27>;
 
