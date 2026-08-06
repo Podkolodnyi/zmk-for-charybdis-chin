@@ -7,11 +7,11 @@ manifest:
 
   projects:
     - name: zmk
-      remote: podkolodnyi  # Твой форк ZMK
-      revision: main
+      remote: podkolodnyi
+      revision: v0.3
       import: app/west.yml
     - name: zmk-pmw3610-driver
-      remote: podkolodnyi  # Твой драйвер
+      remote: podkolodnyi
       revision: main
       
   self:
