@@ -1,7 +1,9 @@
 # This file generates the GitHub Actions build matrix.
 #
-# Charybdis uses nice!nano v2, which is represented by
-# the nice_nano board in current ZMK/Zephyr versions.
+# Debug configuration:
+# - right half uses USB logging;
+# - left half remains a normal peripheral build;
+# - settings_reset is built separately.
 
 include:
   - board: nice_nano
@@ -9,8 +11,8 @@ include:
 
   - board: nice_nano
     shield: charybdis_right
-    snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_ZMK_STUDIO=y
+    snippet: zmk-usb-logging
+    cmake-args: -DCONFIG_ZMK_USB_LOGGING=y -DCONFIG_ZMK_LOG_LEVEL=4
 
   - board: nice_nano
     shield: settings_reset
